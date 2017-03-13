@@ -4,7 +4,8 @@ import tensorflow as tf
 # mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 from sentiment_features import create_feature_sets_and_labels
 import numpy as np
-
+# import nltk
+# nltk.download()
 train_x, train_y, test_x, test_y = create_feature_sets_and_labels('../pos.txt', '../neg.txt')
 
 n_nodes_hl1 = 500

@@ -1,6 +1,8 @@
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
+import nltk
 
+# nltk.download()
 mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
 n_nodes_hl1 = 500
@@ -67,9 +69,10 @@ def train_neural_network(x):
         accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
         print 'Accuracy:', accuracy.eval({x:mnist.test.images, y:mnist.test.labels})
 
-# train_neural_network(x)
 
 print mnist.train.num_examples
 print mnist.test.images.shape
 epoch_x, epoch_y = mnist.train.next_batch(batch_size)
 print epoch_x.shape, epoch_y.shape
+
+train_neural_network(x)

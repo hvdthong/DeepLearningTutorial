@@ -10,8 +10,8 @@ from collections import Counter
 # sys.setdefaultencoding('utf-8')
 
 
-# nltk.download('punkt')
-# nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('wordnet')
 lemmatizer = WordNetLemmatizer()
 hm_lines = 10000000
 

@@ -33,6 +33,7 @@ import numpy as np
 # print np.ones((1, 2))
 
 x = [[1, 0, 0], [1, 0 , 0], [0, 0, 1]]
+print x[-1]
 y = [[0, 1, 0], [1, 0, 0], [0, 0, 1]]
 correct = np.equal(np.argmax(x, 1), np.argmax(y, 1))
 # print correct
@@ -40,4 +41,16 @@ accuracy = np.mean(correct)
 print correct, accuracy
 
 print np.mean([False, True])
+
+x = np.ones((1, 2, 3))
+x_T = np.transpose(x, (1, 0, 2))
+print x.shape, x_T.shape
+print x[0]
+print x_T[0], x_T[1]
+
+x_R = np.reshape(x_T, [-1, 3])
+print x_R
+
+# x_S = np.split(0, 3, x_R)
+# print x_S
 
