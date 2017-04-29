@@ -15,6 +15,7 @@ chunk_size, n_chunks, rnn_size = 28, 28, 128
 x = tf.placeholder('float', [None, n_chunks, chunk_size])  # 28x28
 y = tf.placeholder('float')
 
+
 def neural_network_model(x):
     layer = {'weights': tf.Variable(tf.random_normal([rnn_size, n_classes])),
              'biases': tf.Variable(tf.random_normal([n_classes]))}
@@ -35,7 +36,7 @@ def train_neural_network(x):
 
     # learning_rate = 0.001
     optimizer = tf.train.AdamOptimizer().minimize(cost)
-
+    x_T = tf.transpose(x, [1, 0, 2])
     # feedforward and backward
 
     with tf.Session() as sess:
@@ -46,7 +47,12 @@ def train_neural_network(x):
                 epoch_x, epoch_y = mnist.train.next_batch(batch_size)
                 # print epoch_x.shape
                 epoch_x = epoch_x.reshape((batch_size, n_chunks, chunk_size))
-                # print epoch_x.shape
+                print epoch_x.shape
+
+                x_T = x_T.eval({x:epoch_x})
+                print x_T.shape
+                break
+
                 # epoch_x_T = epoch_x.transpose((1, 0, 2))
                 # print epoch_x_T.shape
                 # epoch_x_R = epoch_x_T.reshape((-1, chunk_size))
