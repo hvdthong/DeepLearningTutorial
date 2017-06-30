@@ -75,4 +75,4 @@ print mnist.test.images.shape
 epoch_x, epoch_y = mnist.train.next_batch(batch_size)
 print epoch_x.shape, epoch_y.shape
 
-train_neural_network(x)
+# train_neural_network(x)

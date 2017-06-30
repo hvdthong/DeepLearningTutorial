@@ -32,7 +32,12 @@ import numpy as np
 # print x.shape, xT.shape
 # print np.ones((1, 2))
 
-x = [[1, 0, 0], [1, 0 , 0], [0, 0, 1]]
+x = [[1, 0, 0], [1, 0, 0], [0, 0, 1]]
+x = np.array(x)
+print type(x)
+print x.reshape([-1, 9])
+print x
+exit()
 print x[-1]
 y = [[0, 1, 0], [1, 0, 0], [0, 0, 1]]
 correct = np.equal(np.argmax(x, 1), np.argmax(y, 1))
@@ -53,4 +58,3 @@ print x_R
 
 # x_S = np.split(0, 3, x_R)
 # print x_S
-
