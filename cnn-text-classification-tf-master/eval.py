@@ -81,6 +81,7 @@ with graph.as_default():
             batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
             all_predictions = np.concatenate([all_predictions, batch_predictions])
 
+
 # Print accuracy if y_test is defined
 if y_test is not None:
     correct_predictions = float(sum(all_predictions == y_test))
