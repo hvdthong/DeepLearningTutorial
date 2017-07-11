@@ -69,6 +69,42 @@ y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
 print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
 print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 
+
+def train_step(x_batch, y_batch):
+    """
+    A single training step
+    """
+    feed_dict = {
+        cnn.input_x: x_batch,
+        cnn.input_y: y_batch,
+        cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
+    }
+    _, step, summaries, loss, accuracy = sess.run(
+        [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
+        feed_dict)
+    time_str = datetime.datetime.now().isoformat()
+    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+    train_summary_writer.add_summary(summaries, step)
+
+
+def dev_step(x_batch, y_batch, writer=None):
+    """
+    Evaluates model on a dev set
+    """
+    feed_dict = {
+        cnn.input_x: x_batch,
+        cnn.input_y: y_batch,
+        cnn.dropout_keep_prob: 1.0
+    }
+    step, summaries, loss, accuracy = sess.run(
+        [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
+        feed_dict)
+    time_str = datetime.datetime.now().isoformat()
+    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+    if writer:
+        writer.add_summary(summaries, step)
+
+
 # Training
 # ==================================================
 with tf.Graph().as_default():
@@ -130,45 +166,6 @@ with tf.Graph().as_default():
 
         # Write vocabulary
         vocab_processor.save(os.path.join(out_dir, "vocab"))
-
-        # Initialize all variables
-        sess.run(tf.global_variables_initializer())
-
-
-        def train_step(x_batch, y_batch):
-            """
-            A single training step
-            """
-            feed_dict = {
-                cnn.input_x: x_batch,
-                cnn.input_y: y_batch,
-                cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
-            }
-            _, step, summaries, loss, accuracy = sess.run(
-                [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
-                feed_dict)
-            time_str = datetime.datetime.now().isoformat()
-            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-            train_summary_writer.add_summary(summaries, step)
-
-
-        def dev_step(x_batch, y_batch, writer=None):
-            """
-            Evaluates model on a dev set
-            """
-            feed_dict = {
-                cnn.input_x: x_batch,
-                cnn.input_y: y_batch,
-                cnn.dropout_keep_prob: 1.0
-            }
-            step, summaries, loss, accuracy = sess.run(
-                [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
-                feed_dict)
-            time_str = datetime.datetime.now().isoformat()
-            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-            if writer:
-                writer.add_summary(summaries, step)
-
 
         # Generate batches
         batches = data_helpers.batch_iter(
