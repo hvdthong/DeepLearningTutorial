@@ -7,6 +7,7 @@ import data_helpers
 from text_cnn import TextCNN
 from tensorflow.contrib import learn
 
+
 pos_path = './data/rt-polaritydata/rt-polarity.pos'
 neg_path = './data/rt-polaritydata/rt-polarity.neg'
 embedding_dim, filter_sizes, num_filters, dropout_keep_prob, l2_reg_lambda = 128, [3, 4, 5], 128, 0.5, 0
@@ -29,56 +30,71 @@ shuffle_indices = np.random.permutation(np.arange(len(y)))
 x_shuffled = x[shuffle_indices]
 y_shuffled = y[shuffle_indices]
 print x_shuffled.shape, y_shuffled.shape
-# print x_shuffled[0], y_shuffled[0]
+
+
+# # Split train/test set
+# # TODO: This is very crude, should use cross-validation
+# dev_sample_index = -1 * int(0.1 * float(len(y)))
+# x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+# y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+# print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
+# print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+# print x_train.shape, y_train.shape
+
+x_train, y_train = x_shuffled, y_shuffled
+
 
 # Training
 # ==================================================
-with tf.Session() as session:
+with tf.Graph().as_default():
     session_conf = tf.ConfigProto(
-        allow_soft_placement=True,
-        log_device_placement=False)
+      allow_soft_placement=True,
+      log_device_placement=False)
     sess = tf.Session(config=session_conf)
-    cnn = TextCNN(
-        sequence_length=x_shuffled.shape[1],
-        num_classes=y_shuffled.shape[1],
-        vocab_size=len(vocab_processor.vocabulary_),
-        embedding_size=embedding_dim,
-        filter_sizes=filter_sizes,
-        num_filters=num_filters,
-        l2_reg_lambda=l2_reg_lambda)
+    with sess.as_default():
+        cnn = TextCNN(
+            sequence_length=x_train.shape[1],
+            num_classes=y_train.shape[1],
+            vocab_size=len(vocab_processor.vocabulary_),
+            embedding_size=embedding_dim,
+            filter_sizes=filter_sizes,
+            num_filters=num_filters,
+            l2_reg_lambda=l2_reg_lambda)
 
-    # Define Training procedure
-    # global_step = tf.Variable(0, name="global_step", trainable=False)
-    # optimizer = tf.train.AdamOptimizer(1e-3)
-    loss, accuracy = cnn.loss, cnn.accuracy
-    optimizer = tf.train.AdamOptimizer().minimize(cnn.loss)
+        # Define Training procedure
+        global_step = tf.Variable(0, name="global_step", trainable=False)
+        optimizer = tf.train.AdamOptimizer(1e-3)
+        grads_and_vars = optimizer.compute_gradients(cnn.loss)
+        train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
 
-    # grads_and_vars = optimizer.compute_gradients(cnn.loss)
-    # train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
+        # Initialize all variables
+        sess.run(tf.global_variables_initializer())
+
+        def train_step(x_batch, y_batch):
+            """
+            A single training step
+            """
+            feed_dict = {
+              cnn.input_x: x_batch,
+              cnn.input_y: y_batch,
+              cnn.dropout_keep_prob: dropout_keep_prob
+            }
+
+            _, step, loss, accuracy = sess.run(
+                [train_op, global_step, cnn.loss, cnn.accuracy],
+                feed_dict)
+            time_str = datetime.datetime.now().isoformat()
+            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+
+            if accuracy == 1:
+                exit()
 
 
-    def train_step(batch, x_batch, y_batch):
-        """
-        A single training step
-        """
-        feed_dict = {
-            cnn.input_x: x_batch,
-            cnn.input_y: y_batch,
-            cnn.dropout_keep_prob: dropout_keep_prob
-        }
-        loss_, accuracy_ = sess.run(
-            [loss, accuracy],
-            feed_dict=feed_dict)
+        # Generate batches
+        batches = data_helpers.batch_iter(
+            list(zip(x_train, y_train)), batch_size, num_epochs)
 
-        print("step {}, loss {:g}, acc {:g}".format(batch, loss_, accuracy_))
-
-    # Generate batches
-    batches = data_helpers.batch_iter(
-        list(zip(x_shuffled, y_shuffled)), batch_size, num_epochs)
-
-    # Training loop. For each batch...
-    for batch in batches:
-        x_batch, y_batch = zip(*batch)
-        train_step(batch, x_batch, y_batch)
-        # current_step = tf.train.global_step(sess, global_step)
-#
+        # Training loop. For each batch...
+        for batch in batches:
+            x_batch, y_batch = zip(*batch)
+            train_step(x_batch, y_batch)
