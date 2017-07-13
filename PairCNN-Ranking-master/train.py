@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#encoding=utf-8
+# encoding=utf-8
 
 import os
 import time
@@ -43,6 +43,7 @@ for attr, value in sorted(FLAGS.__flags.items()):
     print("{}={}".format(attr.upper(), value))
 print("")
 
+
 def pad_sentences(sentences, sequence_length, padding_word="<PAD/>"):
     padded_sentences = []
     for i in range(len(sentences)):
@@ -55,28 +56,33 @@ def pad_sentences(sentences, sequence_length, padding_word="<PAD/>"):
         padded_sentences.append(new_sentence)
     return padded_sentences
 
+
 def build_vocab(sentences):
     # Build vocabulary
     word_counts = Counter(itertools.chain(*sentences))
     # Mapping from index to word
-    vocabulary_inv = [x[0] for x in word_counts.most_common(FLAGS.most_words-1)]
+    vocabulary_inv = [x[0] for x in word_counts.most_common(FLAGS.most_words - 1)]
     vocabulary_inv = list(sorted(vocabulary_inv))
     vocabulary_inv.append('<UNK/>')
     # Mapping from word to index
     vocabulary = {x: i for i, x in enumerate(vocabulary_inv)}
     return [vocabulary, vocabulary_inv]
 
+
 def build_input_data(data_left, data_right, label, vocab):
     vocabset = set(vocab.keys())
-    out_left = np.array([[vocab[word] if word in vocabset else vocab['<UNK/>'] for word in sentence ] for sentence in data_left])
-    out_right = np.array([[vocab[word] if word in vocabset else vocab['<UNK/>'] for word in sentence ] for sentence in data_right])
+    out_left = np.array(
+        [[vocab[word] if word in vocabset else vocab['<UNK/>'] for word in sentence] for sentence in data_left])
+    out_right = np.array(
+        [[vocab[word] if word in vocabset else vocab['<UNK/>'] for word in sentence] for sentence in data_right])
     out_y = np.array([[0, 1] if x == 1 else [1, 0] for x in label])
     return [out_left, out_right, out_y]
+
 
 def load_data(filepath, vocab_tuple=None):
     data = list(set(open(filepath).readlines()))
     data = [d.split(',') for d in data]
-    data = filter(lambda x: len(x)==3, data)
+    data = filter(lambda x: len(x) == 3, data)
     data_left = [x[0].strip().split(' ') for x in data]
     data_right = [x[1].strip().split(' ') for x in data]
     data_label = [int(x[2]) for x in data]
@@ -84,7 +90,7 @@ def load_data(filepath, vocab_tuple=None):
     data_left = pad_sentences(data_left, FLAGS.max_len_left)
     data_right = pad_sentences(data_right, FLAGS.max_len_right)
     if vocab_tuple is None:
-        vocab, vocab_inv = build_vocab(data_left+data_right)
+        vocab, vocab_inv = build_vocab(data_left + data_right)
     else:
         vocab, vocab_inv = vocab_tuple
     data_left, data_right, data_label = build_input_data(data_left, data_right, data_label, vocab)
@@ -96,11 +102,14 @@ def load_data(filepath, vocab_tuple=None):
     '''
     return data_left, data_right, data_label, vocab, vocab_inv, num_pos
 
+
 def main():
     # Load data
     print("Loading data...")
-    x_left_train, x_right_train, y_train, vocab, vocab_inv, num_pos = load_data(os.path.join(FLAGS.train_dir, 'data/train.txt'))
-    x_left_dev, x_right_dev, y_dev, vocab, vocab_inv, num_pos = load_data(os.path.join(FLAGS.train_dir, 'data/test.txt'), (vocab, vocab_inv))
+    x_left_train, x_right_train, y_train, vocab, vocab_inv, num_pos = load_data(
+        os.path.join(FLAGS.train_dir, 'data/train.txt'))
+    x_left_dev, x_right_dev, y_dev, vocab, vocab_inv, num_pos = load_data(
+        os.path.join(FLAGS.train_dir, 'data/test.txt'), (vocab, vocab_inv))
 
     '''
     # Randomly shuffle data
@@ -122,8 +131,8 @@ def main():
 
     with tf.Graph().as_default():
         session_conf = tf.ConfigProto(
-        allow_soft_placement=FLAGS.allow_soft_placement,
-        log_device_placement=FLAGS.log_device_placement)
+            allow_soft_placement=FLAGS.allow_soft_placement,
+            log_device_placement=FLAGS.log_device_placement)
         sess = tf.Session(config=session_conf)
         with sess.as_default():
             cnn = Ranking(
@@ -156,7 +165,7 @@ def main():
             def batch_iter(all_data, batch_size, num_epochs, shuffle=True):
                 data = np.array(all_data)
                 data_size = len(data)
-                num_batches_per_epoch = int(data_size/batch_size)
+                num_batches_per_epoch = int(data_size / batch_size)
                 for epoch in range(num_epochs):
                     # Shuffle the data at each epoch
                     if shuffle:
@@ -171,10 +180,10 @@ def main():
 
             def train_step(x_left_batch, x_right_batch, y_batch):
                 feed_dict = {
-                cnn.input_left: x_left_batch,
-                cnn.input_right: x_right_batch,
-                cnn.input_y: y_batch,
-                cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
+                    cnn.input_left: x_left_batch,
+                    cnn.input_right: x_right_batch,
+                    cnn.input_y: y_batch,
+                    cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
                 }
                 _, step, loss, accuracy = sess.run(
                     [train_op, global_step, cnn.loss, cnn.accuracy],
@@ -185,14 +194,14 @@ def main():
 
             def dev_step(x_left_batch_dev, x_right_batch_dev, y_batch_dev):
                 feed_dict = {
-                cnn.input_left: x_left_batch_dev,
-                cnn.input_right: x_right_batch_dev,
-                cnn.input_y: y_batch_dev,
-                cnn.dropout_keep_prob: 1.0
+                    cnn.input_left: x_left_batch_dev,
+                    cnn.input_right: x_right_batch_dev,
+                    cnn.input_y: y_batch_dev,
+                    cnn.dropout_keep_prob: 1.0
                 }
                 step, loss, accuracy, sims, pres = sess.run(
-                        [global_step, cnn.loss, cnn.accuracy, cnn.sims, cnn.scores],
-                        feed_dict)
+                    [global_step, cnn.loss, cnn.accuracy, cnn.sims, cnn.scores],
+                    feed_dict)
                 '''
                 for sims,x1,x2,l,p in zip(sims, x_left_batch_dev, x_right_batch_dev, y_batch_dev, pres):
                     print ''.join([vocab_inv[x] for x in x1])
@@ -200,11 +209,11 @@ def main():
                     print sims, l, p
                     break
                 '''
-                return loss,accuracy
+                return loss, accuracy
 
             def dev_whole(x_left_dev, x_right_dev, y_dev):
                 batches_dev = batch_iter(
-                    list(zip(x_left_dev, x_right_dev, y_dev)), FLAGS.batch_size*2, 1, shuffle=False)
+                    list(zip(x_left_dev, x_right_dev, y_dev)), FLAGS.batch_size * 2, 1, shuffle=False)
                 losses = []
                 accuracies = []
                 for idx, batch_dev in enumerate(batches_dev):
@@ -218,8 +227,8 @@ def main():
                 n = len(dev_loss)
                 if n < 5:
                     return False
-                for i in xrange(n-4, n):
-                    if dev_loss[i] > dev_loss[i-1]:
+                for i in xrange(n - 4, n):
+                    if dev_loss[i] > dev_loss[i - 1]:
                         return False
                 return True
 
@@ -255,6 +264,7 @@ def main():
                 if current_step % FLAGS.checkpoint_every == 0:
                     path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                     print("Saved model checkpoint to {}\n".format(path))
+
 
 if __name__ == '__main__':
     main()
