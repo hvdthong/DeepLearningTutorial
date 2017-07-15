@@ -144,12 +144,22 @@ with tf.Graph().as_default():
               cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
             }
 
-            _, step, loss, accuracy = sess.run(
-                [train_op, global_step, cnn.loss, cnn.accuracy],
+            _, step, loss, accuracy, W = sess.run(
+                [train_op, global_step, cnn.loss, cnn.accuracy, cnn.W],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
-            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
 
+            # print W.shape
+            # vocab_dict = vocab_processor.vocabulary_._mapping
+            # for w in vocab_dict:
+            #     print w
+            #
+            # exit()
+            # if accuracy == 1:
+            #     print W.shape, vocab_processor.vocabulary_
+            #     exit()
+
+            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
 
         def dev_step(x_batch, y_batch, writer=None):
             """

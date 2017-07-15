@@ -19,7 +19,7 @@ tf.flags.DEFINE_string("negative_data_file", "./data/rt-polaritydata/rt-polarity
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/1499749562/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/1500104294/checkpoints/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 
 # Misc Parameters
@@ -74,12 +74,17 @@ with graph.as_default():
         # Generate batches for one epoch
         batches = data_helpers.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
 
+        # Get word vector matrix
+        # word2vec = graph.get_operation_by_name("embedding/word2vec").outputs[0]
+        # print type(word2vec)
+        # exit()
+
         # Collect the predictions here
         all_predictions = []
 
         for x_test_batch in batches:
-            batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
-            all_predictions = np.concatenate([all_predictions, batch_predictions])
+            batch_predictions = sess.run([predictions], {input_x: x_test_batch, dropout_keep_prob: 1.0})
+            all_predictions = np.concatenate([all_predictions, batch_predictions[0]])
 
 
 # Print accuracy if y_test is defined

@@ -22,8 +22,7 @@ class TextCNN(object):
         # Embedding layer
         with tf.device('/gpu:0'), tf.name_scope("embedding"):
             self.W = tf.Variable(
-                tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0),
-                name="W")
+                tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0), name="word2vec")
             self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
             self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
 
@@ -33,7 +32,7 @@ class TextCNN(object):
             with tf.name_scope("conv-maxpool-%s" % filter_size):
                 # Convolution Layer
                 filter_shape = [filter_size, embedding_size, 1, num_filters]
-                W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W")
+                W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W_filter")
                 b = tf.Variable(tf.constant(0.1, shape=[num_filters]), name="b")
                 conv = tf.nn.conv2d(
                     self.embedded_chars_expanded,
@@ -64,7 +63,7 @@ class TextCNN(object):
         # Final (unnormalized) scores and predictions
         with tf.name_scope("output"):
             W = tf.get_variable(
-                "W",
+                name="W_output",
                 shape=[num_filters_total, num_classes],
                 initializer=tf.contrib.layers.xavier_initializer())
             b = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b")
