@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-#encoding=utf-8
+# encoding=utf-8
 
 import tensorflow as tf
 
+
 class Ranking(object):
     def __init__(
-      self, max_len_left, max_len_right, vocab_size,
-      embedding_size, filter_sizes, num_filters, num_hidden, l2_reg_lambda=0.0):
-
+            self, max_len_left, max_len_right, vocab_size,
+            embedding_size, filter_sizes, num_filters, num_hidden, l2_reg_lambda=0.0):
         # Placeholders for input, output and dropout
         self.input_left = tf.placeholder(tf.int32, [None, max_len_left], name="input_left")
         self.input_right = tf.placeholder(tf.int32, [None, max_len_right], name="input_right")
@@ -72,8 +72,10 @@ class Ranking(object):
 
         # Combine all the pooled features
         num_filters_total = num_filters * len(filter_sizes)
-        self.h_pool_left = tf.reshape(tf.concat(3, pooled_outputs_left), [-1, num_filters_total], name='h_pool_left')
-        self.h_pool_right = tf.reshape(tf.concat(3, pooled_outputs_right), [-1, num_filters_total], name='h_pool_right')
+        self.h_pool_left = tf.reshape(tf.concat(pooled_outputs_left, len(pooled_outputs_left)), [-1, num_filters_total],
+                                      name='h_pool_left')
+        self.h_pool_right = tf.reshape(tf.concat(pooled_outputs_right, len(pooled_outputs_right)),
+                                       [-1, num_filters_total], name='h_pool_right')
         print self.h_pool_left
         print self.h_pool_right
 
@@ -84,7 +86,8 @@ class Ranking(object):
                 shape=[num_filters_total, num_filters_total],
                 initializer=tf.contrib.layers.xavier_initializer())
             self.transform_left = tf.matmul(self.h_pool_left, W)
-            self.sims = tf.reduce_sum(tf.mul(self.transform_left, self.h_pool_right), 1, keep_dims=True)
+            self.transform_right = tf.multiply(self.transform_left, self.h_pool_right)
+            self.sims = tf.reduce_sum(tf.multiply(self.transform_left, self.h_pool_right), 1, keep_dims=True)
             print self.sims
 
         # Keeping track of l2 regularization loss (optional)
@@ -97,7 +100,7 @@ class Ranking(object):
         with tf.name_scope("hidden"):
             W = tf.get_variable(
                 "W_hidden",
-                shape=[2*num_filters_total+1, num_hidden],
+                shape=[2 * num_filters_total + 1, num_hidden],
                 initializer=tf.contrib.layers.xavier_initializer())
             b = tf.Variable(tf.constant(0.1, shape=[num_hidden]), name="b")
             l2_loss += tf.nn.l2_loss(W)

@@ -20,7 +20,7 @@ class TextCNN(object):
         l2_loss = tf.constant(0.0)
 
         # Embedding layer
-        with tf.device('/gpu:0'), tf.name_scope("embedding"):
+        with tf.device('/gpu:2'), tf.name_scope("embedding"):
             self.W = tf.Variable(
                 tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0), name="word2vec")
             self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x, name='embedded_chars')
