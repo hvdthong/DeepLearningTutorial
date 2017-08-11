@@ -1,7 +1,7 @@
 import tensorflow as tf
 # from tensorflow.examples.tutorials.mnist import input_data
 #
-# mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+# mnist = input_data.read_data_sets("/train/data/", one_hot=True)
 from sentiment_features import create_feature_sets_and_labels
 import numpy as np
 # import nltk
