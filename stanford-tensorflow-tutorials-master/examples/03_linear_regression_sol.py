@@ -6,7 +6,8 @@ Prepared for the class CS 20SI: "TensorFlow for Deep Learning Research"
 cs20si.stanford.edu
 """
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -32,7 +33,7 @@ w = tf.Variable(0.0, name='weights')
 b = tf.Variable(0.0, name='bias')
 
 # Step 4: build model to predict Y
-Y_predicted = X * w + b 
+Y_predicted = X * w + b
 
 # Step 5: use the square error as the loss function
 loss = tf.square(Y - Y_predicted, name='loss')
@@ -42,25 +43,25 @@ loss = tf.square(Y - Y_predicted, name='loss')
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(loss)
 
 with tf.Session() as sess:
-	# Step 7: initialize the necessary variables, in this case, w and b
-	sess.run(tf.global_variables_initializer()) 
-	
-	writer = tf.summary.FileWriter('./graphs/linear_reg', sess.graph)
-	
-	# Step 8: train the model
-	for i in range(50): # train the model 100 epochs
-		total_loss = 0
-		for x, y in data:
-			# Session runs train_op and fetch values of loss
-			_, l = sess.run([optimizer, loss], feed_dict={X: x, Y:y}) 
-			total_loss += l
-		print('Epoch {0}: {1}'.format(i, total_loss/n_samples))
+    # Step 7: initialize the necessary variables, in this case, w and b
+    sess.run(tf.global_variables_initializer())
 
-	# close the writer when you're done using it
-	writer.close() 
-	
-	# Step 9: output the values of w and b
-	w, b = sess.run([w, b]) 
+    writer = tf.summary.FileWriter('./graphs/linear_reg', sess.graph)
+
+    # Step 8: train the model
+    for i in range(50):  # train the model 100 epochs
+        total_loss = 0
+        for x, y in data:
+            # Session runs train_op and fetch values of loss
+            _, l = sess.run([optimizer, loss], feed_dict={X: x, Y: y})
+            total_loss += l
+        print('Epoch {0}: {1}'.format(i, total_loss / n_samples))
+
+    # close the writer when you're done using it
+    writer.close()
+
+    # Step 9: output the values of w and b
+    w, b = sess.run([w, b])
 
 # plot the results
 X, Y = data.T[0], data.T[1]
