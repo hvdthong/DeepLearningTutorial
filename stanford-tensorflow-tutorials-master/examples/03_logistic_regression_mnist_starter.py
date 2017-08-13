@@ -6,7 +6,8 @@ Prepared for the class CS 20SI: "TensorFlow for Deep Learning Research"
 cs20si.stanford.edu
 """
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import numpy as np
 import tensorflow as tf
@@ -20,7 +21,7 @@ n_epochs = 10
 
 # Step 1: Read in data
 # using TF Learn's built in function to load MNIST data to the folder data/mnist
-mnist = input_data.read_data_sets('/data/mnist', one_hot=True) 
+mnist = input_data.read_data_sets('/data/mnist', one_hot=True)
 
 # Step 2: create placeholders for features and labels
 # each image in the MNIST data is of shape 28*28 = 784
@@ -54,35 +55,35 @@ mnist = input_data.read_data_sets('/data/mnist', one_hot=True)
 
 
 with tf.Session() as sess:
-	start_time = time.time()
-	sess.run(tf.global_variables_initializer())	
-	n_batches = int(mnist.train.num_examples/batch_size)
-	for i in range(n_epochs): # train the model n_epochs times
-		total_loss = 0
+    start_time = time.time()
+    sess.run(tf.global_variables_initializer())
+    n_batches = int(mnist.train.num_examples / batch_size)
+    for i in range(n_epochs):  # train the model n_epochs times
+        total_loss = 0
 
-		for _ in range(n_batches):
-			X_batch, Y_batch = mnist.train.next_batch(batch_size)
-			# TO-DO: run optimizer + fetch loss_batch
-			# 
-			# 
-			total_loss += loss_batch
-		print('Average loss epoch {0}: {1}'.format(i, total_loss/n_batches))
+        for _ in range(n_batches):
+            X_batch, Y_batch = mnist.train.next_batch(batch_size)
+            # TO-DO: run optimizer + fetch loss_batch
+            #
+            #
+            total_loss += loss_batch
+        print('Average loss epoch {0}: {1}'.format(i, total_loss / n_batches))
 
-	print('Total time: {0} seconds'.format(time.time() - start_time))
+    print('Total time: {0} seconds'.format(time.time() - start_time))
 
-	print('Optimization Finished!') # should be around 0.35 after 25 epochs
+    print('Optimization Finished!')  # should be around 0.35 after 25 epochs
 
-	# test the model
-	preds = tf.nn.softmax(logits)
-	correct_preds = tf.equal(tf.argmax(preds, 1), tf.argmax(Y, 1))
-	accuracy = tf.reduce_sum(tf.cast(correct_preds, tf.float32)) # need numpy.count_nonzero(boolarr) :(
-	
-	n_batches = int(mnist.test.num_examples/batch_size)
-	total_correct_preds = 0
-	
-	for i in range(n_batches):
-		X_batch, Y_batch = mnist.test.next_batch(batch_size)
-		accuracy_batch = sess.run([accuracy], feed_dict={X: X_batch, Y:Y_batch}) 
-		total_correct_preds += accuracy_batch	
-	
-	print('Accuracy {0}'.format(total_correct_preds/mnist.test.num_examples))
+    # test the model
+    preds = tf.nn.softmax(logits)
+    correct_preds = tf.equal(tf.argmax(preds, 1), tf.argmax(Y, 1))
+    accuracy = tf.reduce_sum(tf.cast(correct_preds, tf.float32))  # need numpy.count_nonzero(boolarr) :(
+
+    n_batches = int(mnist.test.num_examples / batch_size)
+    total_correct_preds = 0
+
+    for i in range(n_batches):
+        X_batch, Y_batch = mnist.test.next_batch(batch_size)
+        accuracy_batch = sess.run([accuracy], feed_dict={X: X_batch, Y: Y_batch})
+        total_correct_preds += accuracy_batch
+
+    print('Accuracy {0}'.format(total_correct_preds / mnist.test.num_examples))
