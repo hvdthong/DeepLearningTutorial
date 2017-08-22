@@ -32,10 +32,10 @@ def flat_docs(docs):
 
 # Start interactive session
 sess = tf.InteractiveSession()
-x = tf.placeholder(tf.float32, shape=[None, 15])
+x = tf.placeholder(tf.int32, shape=[None, 3, 5])
 x_ = tf.reshape(x, [-1, 5])
 W_code = tf.Variable(tf.random_uniform([12, 4], -1.0, 1.0), name="W_code")
-embedded_chars_code_left = tf.nn.embedding_lookup(W_code, x_[0])
+embedded_chars_code_left = tf.nn.embedding_lookup(W_code, x)
 embedded_chars_expanded_code_left = tf.expand_dims(embedded_chars_code_left, -1)
 
 
@@ -59,13 +59,18 @@ if __name__ == "__main__":
     text_vocab_processor = learn.preprocessing.VocabularyProcessor(max_sents)
     x_text = np.array(list(text_vocab_processor.fit_transform(new_sents)))
     print len(text_vocab_processor.vocabulary_)
-    exit()
+
     print x_text.shape
     print x_text
     a = x_text[:(x_text.shape[0] / 2)].reshape(-1, 15)
+    a = x_text[:(x_text.shape[0] / 2)]
     print a.reshape(-1, 15)
     print a.reshape(3, 5)
+    print a.reshape(-1, 5)
     sess.run(tf.global_variables_initializer())
-    train_accuracy = embedded_chars_expanded_code_left.eval(feed_dict={x: [a]})
+    testing = embedded_chars_expanded_code_left.eval(feed_dict={x: [a]})
+    print testing.shape
+    print testing
+
     # print new_docs
     # print len(new_docs)
