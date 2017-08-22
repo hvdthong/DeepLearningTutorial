@@ -59,7 +59,7 @@ if __name__ == "__main__":
     text_vocab_processor = learn.preprocessing.VocabularyProcessor(max_sents)
     x_text = np.array(list(text_vocab_processor.fit_transform(new_sents)))
     print len(text_vocab_processor.vocabulary_)
-    exit()
+    # exit()
     print x_text.shape
     print x_text
     a = x_text[:(x_text.shape[0] / 2)].reshape(-1, 15)
