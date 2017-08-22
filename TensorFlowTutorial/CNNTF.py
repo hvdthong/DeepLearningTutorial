@@ -17,7 +17,7 @@ W_conv1 = tf.Variable(tf.truncated_normal([5, 5, 1, 32], stddev=0.1))
 b_conv1 = tf.Variable(tf.constant(0.1, shape=[32]))  # need 32 biases for 32 outputs
 convolve1 = tf.nn.conv2d(x_image, W_conv1, strides=[1, 1, 1, 1], padding='SAME') + b_conv1
 h_conv1 = tf.nn.relu(convolve1)
-h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # max_pool_2x2
+h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 6, 6, 1], padding='SAME')  # max_pool_2x2
 layer1 = h_pool1
 
 W_conv2 = tf.Variable(tf.truncated_normal([5, 5, 32, 64], stddev=0.1))
