@@ -37,6 +37,7 @@ x_ = tf.reshape(x, [-1, 5])
 W_code = tf.Variable(tf.random_uniform([12, 4], -1.0, 1.0), name="W_code")
 embedded_chars_code_left = tf.nn.embedding_lookup(W_code, x)
 embedded_chars_expanded_code_left = tf.expand_dims(embedded_chars_code_left, -1)
+# embedded_chars_expanded_code_left = tf.reshape(embedded_chars_expanded_code_left, (-1, 5, 4))
 
 
 if __name__ == "__main__":
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     print a.reshape(-1, 15)
     print a.reshape(3, 5)
     print a.reshape(-1, 5)
-    sess.run(tf.global_variables_initializer())
+    sess.run(tf.initialize_all_variables())
     testing = embedded_chars_expanded_code_left.eval(feed_dict={x: [a]})
     print testing.shape
     print testing
