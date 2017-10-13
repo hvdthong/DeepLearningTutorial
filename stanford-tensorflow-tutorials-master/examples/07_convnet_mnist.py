@@ -25,7 +25,7 @@ N_CLASSES = 10
 
 # Step 1: Read in data
 # using TF Learn's built in function to load MNIST data to the folder data/mnist
-mnist = input_data.read_data_sets("/data/mnist", one_hot=True)
+mnist = input_data.read_data_sets("./data/mnist", one_hot=True)
 
 # Step 2: Define paramaters for the model
 LEARNING_RATE = 0.001
@@ -136,9 +136,11 @@ utils.make_dir('checkpoints/convnet_mnist')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
+
     # to visualize using TensorBoard
     writer = tf.summary.FileWriter('./graphs/convnet', sess.graph)
     ckpt = tf.train.get_checkpoint_state(os.path.dirname('checkpoints/convnet_mnist/checkpoint'))
+
     # if that checkpoint exists, restore from checkpoint
     if ckpt and ckpt.model_checkpoint_path:
         saver.restore(sess, ckpt.model_checkpoint_path)
