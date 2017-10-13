@@ -36,6 +36,8 @@ Y = tf.placeholder(tf.int32, [None, 10], name='Y_placeholder')
 # shape of b depends on Y
 w = tf.Variable(tf.random_normal(shape=[784, 10], stddev=0.01), name="weights")
 b = tf.Variable(tf.zeros([1, 10]), name="bias")
+# w = tf.get_variable(shape=[784, 10], name="weights", initializer=tf.contrib.layers.xavier_initializer())
+# b = tf.get_variable(shape=[10], name="bias", initializer=tf.contrib.layers.xavier_initializer())
 
 # Step 4: build model
 # the model that returns the logits.
