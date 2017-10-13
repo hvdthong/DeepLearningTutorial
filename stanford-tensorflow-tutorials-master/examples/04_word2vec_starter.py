@@ -102,15 +102,6 @@ def word2vec(batch_gen):
 
 def main():
     batch_gen = process_data(VOCAB_SIZE, BATCH_SIZE, SKIP_WINDOW)
-    # print(batch_gen)
-    # print(type(batch_gen))
-    # center, target = next(batch_gen)
-    # print(center)
-    # print(target)
-    # # print (len(batch_gen))
-    # print(center.shape)
-    # print(target.shape)
-    # exit()
     word2vec(batch_gen)
 
 
