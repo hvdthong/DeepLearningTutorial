@@ -49,7 +49,7 @@ def neural_network_model(data):
 
 def train_neural_network(x):
     prediction = neural_network_model(x)
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(prediction, y))
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
 
     # learning_rate = 0.001
     optimizer = tf.train.AdamOptimizer().minimize(cost)
@@ -57,7 +57,7 @@ def train_neural_network(x):
     # feedforward and backward
     hm_epochs = 20
     with tf.Session() as sess:
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
         for epoch in range(hm_epochs):
             epoch_loss = 0
             i = 0

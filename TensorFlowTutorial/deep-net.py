@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 import nltk
 
-# nltk.download()
+nltk.download()
 mnist = input_data.read_data_sets("/train/data/", one_hot=True)
 
 n_nodes_hl1 = 500
